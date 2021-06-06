@@ -9,9 +9,22 @@ import java.util.List;
  **/
 @Data
 public class MethodInfo {
-    private int accessFlag;
+    private int accessFlags;
     private int nameIndex;
     private int descriptorIndex;
     private int attributesLength;
-    private List<AttributeInfo> attributeInfos;
+    private CodeAttributeInfo[] attributes;
+    private InstanceKlass belongKlass;
+    private String methodName;
+
+    public void initAttributeContainer() {
+        attributes = new CodeAttributeInfo[attributesLength];
+    }
+
+    @Override
+    public String toString() {
+        return "MethodInfo{ "
+                + belongKlass.getConstantPool().getMethodName(nameIndex) + "#"
+                + " }";
+    }
 }

@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 public class FieldInfo {
 
-    private int accessFlag;
+    private int accessFlags;
     private int nameIndex;
     private int descriptorIndex;
     private int attributesLength;

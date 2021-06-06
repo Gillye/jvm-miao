@@ -2,6 +2,8 @@ package com.miao.jvm.hotspot.src.share.vm.oop;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author miaozhou
  **/
@@ -22,9 +24,13 @@ public class InstanceKlass extends Klass{
 
 
     private int interfaceLength;
+    private List<InterfaceInfo> interfaceInfos;
 
 
     private int fieldLength;
+    private List<FieldInfo> fieldInfos;
+
+    private int methodLength;
 
 
     private int attributesLength;

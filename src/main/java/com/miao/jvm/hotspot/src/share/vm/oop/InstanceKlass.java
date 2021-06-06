@@ -2,6 +2,7 @@ package com.miao.jvm.hotspot.src.share.vm.oop;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,14 +32,25 @@ public class InstanceKlass extends Klass{
     private List<FieldInfo> fieldInfos;
 
     private int methodLength;
+    private MethodInfo[] methods;
 
 
     private int attributesLength;
+    private List<AttributeInfo> attributeInfos = new ArrayList<>();
 
     public InstanceKlass() {
         constantPool = new ConstantPool();
 
         constantPool.setKlass(this);
+    }
+
+    public void initMethodsContainer() {
+        methods = new MethodInfo[methodLength];
+    }
+
+    @Override
+    public String toString() {
+        return "InstanceKlass{ }";
     }
 
 }

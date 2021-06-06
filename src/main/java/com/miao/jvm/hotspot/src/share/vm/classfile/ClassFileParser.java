@@ -78,13 +78,69 @@ public class ClassFileParser {
         index += 2;
         int methodLength = DataTranslate.byteToUnsignedShort(u2Arr);
         klass.setMethodLength(methodLength);
-        if(methodLength > 0){
-            //解析方法
-        }
 
+        klass.initMethodsContainer();
+
+        //解析方法
+        index = parserMethodInfo(content,index,klass);
+
+        // 属性数量
+        Stream.readU2Simple(content, index, u2Arr);
+        index += 2;
+
+        klass.setAttributesLength(DataTranslate.byteToUnsignedShort(u2Arr));
+
+        logger.info("开始解析类的属性，数量: " + klass.getAttributesLength());
+
+        // 属性
+        for (int i = 0; i < klass.getAttributesLength(); i++) {
+            Stream.readU2Simple(content, index, u2Arr);
+
+            String attrName = (String) klass.getConstantPool().getDataMap().get(DataTranslate.byteToUnsignedShort(u2Arr));
+            if (attrName.equals("SourceFile")) {
+                index = parseSourceFile(content, index, klass);
+            } else {
+                throw new Error("无法识别的类属性: " + attrName);
+            }
+        }
         return klass;
     }
 
+    private static int parseSourceFile(byte[] content, int index, InstanceKlass klass) {
+        byte[] u2Arr = new byte[2];
+        byte[] u4Arr = new byte[4];
+
+        AttributeInfo attributeInfo = new AttributeInfo();
+
+        klass.getAttributeInfos().add(attributeInfo);
+
+        // name index
+        Stream.readU2Simple(content, index, u2Arr);
+        index += 2;
+
+        attributeInfo.setAttrNameIndex(DataTranslate.byteToUnsignedShort(u2Arr));
+
+        // length
+        Stream.readU4Simple(content, index, u4Arr);
+        index += 4;
+
+        attributeInfo.setAttrLength(DataTranslate.byteArrayToInt(u4Arr));
+
+        attributeInfo.initContainer();
+
+        // data
+        Stream.readU2Simple(content, index, attributeInfo.getContainer());
+        index += 2;
+
+        logger.info("\t第 " + klass.getAttributeInfos().size() + " 个属性: " + klass.getConstantPool().getDataMap().get(attributeInfo.getAttrNameIndex())
+                + ", name index: " + attributeInfo.getAttrNameIndex()
+                + ", length: " + attributeInfo.getAttrLength()
+                + ", data: " + DataTranslate.byteToUnsignedShort(attributeInfo.getContainer())
+                + "( " + klass.getConstantPool().getDataMap().get(DataTranslate.byteToUnsignedShort(attributeInfo.getContainer())) + " )"
+        );
+
+        return index;
+    }
 
     private static int parserMethodInfo(byte [] content,int index,InstanceKlass klass){
         byte[] u2Arr = new byte[2];
